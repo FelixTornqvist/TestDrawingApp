@@ -1,103 +1,61 @@
-#ifdef __cplusplus
-    #include <cstdlib>
-#else
-    #include <stdlib.h>
-#endif
-
+#include <iostream>
 #include <SDL.h>
 
-int main ( int argc, char** argv )
-{
-    // initialize SDL video
-    if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-    {
-        printf( "Unable to init SDL: %s\n", SDL_GetError() );
-        return 1;
-    }
+#include "Texture.hpp"
 
-    // make sure SDL cleans up before exit
-    atexit(SDL_Quit);
+using namespace drawApp;
+using namespace std;
 
-    // create a new window
-    SDL_Window* screen;
-    SDL_Renderer* ren;
+int main ( int argc, char** argv ) {
+	if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
+		printf( "Unable to init SDL: %s\n", SDL_GetError() );
+		return 1;
+	}
 
-    if ( SDL_CreateWindowAndRenderer(640, 480, 0, &screen, &ren) == -1)
-    {
-        printf("Unable to set 640x480 video: %s\n", SDL_GetError());
-        return 1;
-    }
+	atexit(SDL_Quit);
 
-    // load an image
-    SDL_Surface* bmp = SDL_LoadBMP("cb.bmp");
-    if (!bmp)
-    {
-        printf("Unable to load bitmap: %s\n", SDL_GetError());
-        return 1;
-    }
+	SDL_Window* screen;
+	SDL_Renderer* ren;
 
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(ren, bmp);
-    if (!tex)
-    {
-        printf("Unable to create Texture: %s\n", SDL_GetError());
-        return 1;
-    }
+	if ( SDL_CreateWindowAndRenderer(640, 480, 0, &screen, &ren) == -1) {
+		printf("Unable to set 640x480 video: %s\n", SDL_GetError());
+		return 1;
+	}
 
-    // centre the bitmap on screen
-    SDL_Rect dstrect;
-    SDL_GetWindowSize(screen, &dstrect.x, &dstrect.y);
-    dstrect.x = (dstrect.x - bmp->w) / 2;
-    dstrect.y = (dstrect.y - bmp->h) / 2;
-    dstrect.w = bmp->w;
-    dstrect.h = bmp->h;
+	Texture* tex;
+	try {
+		tex = Texture::createFromFile("cb.bmp", ren);
+	} catch (exception& e) {
+		cout << "could not create/load texture: " << e.what() << endl;
+		return -1;
+	}
 
-    // program main loop
-    bool done = false;
-    while (!done)
-    {
-        // message processing loop
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            // check for messages
-            switch (event.type)
-            {
-                // exit if the window is closed
-            case SDL_QUIT:
-                done = true;
-                break;
+	bool done = false;
+	while (!done) {
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
 
-                // check for keypresses
-            case SDL_KEYDOWN:
-                {
-                    // exit if ESCAPE is pressed
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
-                        done = true;
-                    break;
-                }
-            } // end switch
-        } // end of message processing
+			switch (event.type) {
+				case SDL_QUIT:
+					done = true;
+					break;
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE)
+						done = true;
+					break;
 
-        // DRAWING STARTS HERE
+			}
+		}
 
-        // clear screen
-        SDL_RenderClear(ren);
+		SDL_RenderClear(ren);
 
-        // draw bitmap
-        SDL_RenderCopy(ren, tex, nullptr, &dstrect);
+		tex->render(ren, NULL, NULL);
 
-        // DRAWING ENDS HERE
+		SDL_RenderPresent(ren);
+		SDL_Delay(1000/60);
+	}
 
-        // finally, update the screen :)
-        SDL_RenderPresent(ren);
-        SDL_Delay(1000/60);
-    } // end main loop
-
-    SDL_DestroyTexture(tex);
-    // free loaded bitmap
-    SDL_FreeSurface(bmp);
-
-    // all is well ;)
-    printf("Exited cleanly\n");
-    return 0;
+	delete tex;
+	printf("Exited cleanly\n");
+	return 0;
 }
