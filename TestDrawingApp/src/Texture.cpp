@@ -72,7 +72,7 @@ namespace drawApp {
 		return newTex;
 	}
 
-	void Texture::render(SDL_Renderer* ren, SDL_Rect* src, SDL_Rect* dest) {
+	void Texture::render(SDL_Renderer* ren, const SDL_Rect* src, const SDL_Rect* dest) {
 		SDL_RenderCopy(ren, mTexture, src, dest);
 	}
 

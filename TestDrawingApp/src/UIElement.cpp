@@ -17,7 +17,7 @@ namespace drawApp {
 		return this;
 	}
 
-	void UIElement::draw(SDL_Renderer* ren) const {
+	void UIElement::draw(SDL_Renderer* ren) {
 		drawMe(ren);
 		for (UIElement* child : children) {
 			child->draw(ren);

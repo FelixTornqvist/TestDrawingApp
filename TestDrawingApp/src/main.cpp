@@ -6,7 +6,7 @@
 
 #include "Window.hpp"
 #include "UIElement.hpp"
-#include "Texture.hpp"
+#include "Canvas.hpp"
 
 using namespace drawApp;
 using namespace std;
@@ -18,12 +18,19 @@ class TestUIElement: public UIElement {
 	public:
 		TestUIElement(const SDL_Rect& pos): UIElement(pos) {}
 
-		void mouseDown(Uint8 btn, SDL_Point& pos) {
-			highlight = false;
+		void mouseDown(Uint32 btn, SDL_Point& pos) {
+			if (btn & SDL_BUTTON(SDL_BUTTON_LEFT))
+				highlight = false;
+			else
+				highlight = true;
 		}
 
 		void mouseUp(SDL_Point& pos) {
-			highlight = false;
+//			highlight = false;
+		}
+
+		void mouseDragged(Uint32 btn, SDL_Point& pos) {
+			cout << this << " dragged: " << pos.x << ":" << pos.y << endl;
 		}
 
 		void mouseHoverOn(SDL_Point& pos) {
@@ -35,7 +42,7 @@ class TestUIElement: public UIElement {
 		}
 
 	protected:
-		void drawMe(SDL_Renderer* ren) const {
+		void drawMe(SDL_Renderer* ren) {
 			if (highlight) {
 				SDL_SetRenderDrawColor(ren, 255,255,255,255);
 				SDL_RenderFillRect(ren, &bounds);
@@ -66,17 +73,12 @@ int main ( int argc, char** argv ) {
 	rootElement = new TestUIElement({10,10,620,460});
 	window->setRootElement(rootElement);
 
-	UIElement* ele1 = new TestUIElement({20,20,100,100});
-	UIElement* ele1c1 = new TestUIElement({30,20,10,10});
-	UIElement* ele1c2 = new TestUIElement({50,20,10,10});
-	UIElement* ele1c3 = new TestUIElement({100,20,100,10});
-	ele1->addChild(ele1c1);
-	ele1->addChild(ele1c2);
-	ele1->addChild(ele1c3);
+	Canvas* canvas = Canvas::getInstance({20,20, 600, 440}, 600,440, window->getRenderer());
+	Texture* testBrush = Texture::createFromFile("brush.png", window->getRenderer());
+	testBrush->setBlendMode(SDL_BLENDMODE_BLEND);
+	canvas->setBrush(testBrush);
 
-	UIElement* ele2 = new TestUIElement({200,200,100,100});
-	rootElement->addChild(ele1);
-	rootElement->addChild(ele2);
+	rootElement->addChild(canvas);
 
 	bool done = false;
 	while (!done) {
@@ -101,6 +103,8 @@ int main ( int argc, char** argv ) {
 		window->update();
 
 	}
+
+	delete testBrush;
 
 	return 0;
 }

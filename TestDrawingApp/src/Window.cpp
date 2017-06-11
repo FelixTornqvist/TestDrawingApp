@@ -75,4 +75,8 @@ namespace drawApp {
 		hoveredElement = rootElement;
 	}
 
+	SDL_Renderer* Window::getRenderer() {
+		return ren;
+	}
+
 }

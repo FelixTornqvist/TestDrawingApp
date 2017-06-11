@@ -14,6 +14,8 @@ namespace drawApp {
 			void update();
 			void setRootElement(UIElement* ele);
 
+			SDL_Renderer* getRenderer();
+
 		protected:
 			Window(std::string title, SDL_Rect possize);
 

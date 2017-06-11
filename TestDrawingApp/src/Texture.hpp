@@ -13,7 +13,7 @@ namespace drawApp {
 			static Texture* createFromFile(std::string path, SDL_Renderer* ren);
 			static Texture* createBlank(int width, int height, SDL_Renderer* ren, SDL_TextureAccess access = SDL_TEXTUREACCESS_STREAMING);
 
-			void render(SDL_Renderer* ren, SDL_Rect* src, SDL_Rect* dest);
+			void render(SDL_Renderer* ren, const SDL_Rect* src, const SDL_Rect* dest);
 			void setAsRenderTarget(SDL_Renderer* ren);
 
 			void setBlendMode(SDL_BlendMode blending);
