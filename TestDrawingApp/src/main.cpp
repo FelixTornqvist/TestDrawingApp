@@ -1,37 +1,83 @@
 #include <iostream>
 #include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
+#include <SDL_ttf.h>
 
+#include "Window.hpp"
+#include "UIElement.hpp"
 #include "Texture.hpp"
 
 using namespace drawApp;
 using namespace std;
 
+Window* window;
+UIElement* rootElement;
+
+class TestUIElement: public UIElement {
+	public:
+		TestUIElement(const SDL_Rect& pos): UIElement(pos) {}
+
+		void mouseDown(Uint8 btn, SDL_Point& pos) {
+			highlight = false;
+		}
+
+		void mouseUp(SDL_Point& pos) {
+			highlight = false;
+		}
+
+		void mouseHoverOn(SDL_Point& pos) {
+			highlight = true;
+		}
+
+		void mouseHoverOff() {
+			highlight = false;
+		}
+
+	protected:
+		void drawMe(SDL_Renderer* ren) const {
+			if (highlight) {
+				SDL_SetRenderDrawColor(ren, 255,255,255,255);
+				SDL_RenderFillRect(ren, &bounds);
+				SDL_SetRenderDrawColor(ren, 0,0,0,255);
+			} else {
+				SDL_SetRenderDrawColor(ren, 0,0,0,255);
+				SDL_RenderFillRect(ren, &bounds);
+				SDL_SetRenderDrawColor(ren, 255,255,255,255);
+				SDL_RenderDrawRect(ren, &bounds);
+				SDL_SetRenderDrawColor(ren, 0,0,0,255);
+			}
+		}
+
+	private:
+		bool highlight = false;
+};
+
+void Quit() {
+	delete window;
+	delete rootElement;
+	printf("Exited cleanly\n");
+}
+
 int main ( int argc, char** argv ) {
-	if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
-		printf( "Unable to init SDL: %s\n", SDL_GetError() );
-		return 1;
-	}
+	atexit(Quit);
 
-	atexit(SDL_Quit);
+	window = Window::getInstance("Hello World!", {100,100,640,480});
+	rootElement = new TestUIElement({10,10,620,460});
+	window->setRootElement(rootElement);
 
-	SDL_Window* screen;
-	SDL_Renderer* ren;
+	UIElement* ele1 = new TestUIElement({20,20,100,100});
+	UIElement* ele1c1 = new TestUIElement({30,20,10,10});
+	UIElement* ele1c2 = new TestUIElement({50,20,10,10});
+	UIElement* ele1c3 = new TestUIElement({100,20,100,10});
+	ele1->addChild(ele1c1);
+	ele1->addChild(ele1c2);
+	ele1->addChild(ele1c3);
 
-	if ( SDL_CreateWindowAndRenderer(640, 480, 0, &screen, &ren) == -1) {
-		printf("Unable to set 640x480 video: %s\n", SDL_GetError());
-		return 1;
-	}
+	UIElement* ele2 = new TestUIElement({200,200,100,100});
+	rootElement->addChild(ele1);
+	rootElement->addChild(ele2);
 
-	Texture* cbImg = Texture::createFromFile("cb.png", ren);
-	SDL_Rect cbDest = {0, 0, cbImg->getWidth(), cbImg->getHeight()};
-	cbImg->setBlendMode(SDL_BLENDMODE_BLEND);
-	cbImg->setColor(0,255,0);
-
-	Texture* renderTo = Texture::createBlank(2000,1000,ren,SDL_TEXTUREACCESS_TARGET);
-	SDL_Rect renderToDst = {100,100,400,300};
-
-	bool bounceUp = false;
-	int speed = 10;
 	bool done = false;
 	while (!done) {
 		SDL_Event event;
@@ -46,50 +92,15 @@ int main ( int argc, char** argv ) {
 						case SDLK_ESCAPE:
 							done = true;
 							break;
-						case SDLK_w:
-							cbDest.y -= speed;
-							break;
-						case SDLK_a:
-							cbDest.x -= speed;
-							break;
-						case SDLK_s:
-							cbDest.y += speed;
-							break;
-						case SDLK_d:
-							cbDest.x += speed;
-							break;
 
 					}
 					break;
-
 			}
 		}
-		if (!bounceUp) {
-			renderToDst.y++;
-			if (renderToDst.y >= 150)
-				bounceUp = true;
-		} else {
-			renderToDst.y--;
-			if (renderToDst.y <= 100)
-				bounceUp = false;
-		}
 
-		SDL_RenderClear(ren);
+		window->update();
 
-		renderTo->setAsRenderTarget(ren);
-		cbImg->setColor((cbDest.x % 200) + 55, (cbDest.y % 200) + 55, 128);
-		cbImg->render(ren, NULL, &cbDest);
-		cbImg->setColor(255,255,255);
-		SDL_SetRenderTarget(ren, NULL);
-
-		cbImg->render(ren,NULL,NULL);
-		renderTo->render(ren,NULL,&renderToDst);
-
-		SDL_RenderPresent(ren);
-		SDL_Delay(1000/60);
 	}
 
-	delete cbImg;
-	printf("Exited cleanly\n");
 	return 0;
 }

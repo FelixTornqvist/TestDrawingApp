@@ -1,2 +1,6 @@
 
 *.cbp
+
+TestDrawingApp/TestDrawingApp\.cscope_file_list
+
+TestDrawingApp/cscope\.out
