@@ -82,6 +82,18 @@ namespace drawApp {
 		SDL_SetRenderTarget(ren, mTexture);
 	}
 
+	void Texture::setBlendMode(SDL_BlendMode blending) {
+		SDL_SetTextureBlendMode(mTexture, blending);
+	}
+
+	void Texture::setColor( Uint8 r, Uint8 g, Uint8 b ) {
+		SDL_SetTextureColorMod(mTexture, r, g, b);
+	}
+
+	void Texture::setAlpha(Uint8 alpha) {
+		SDL_SetTextureAlphaMod(mTexture, alpha);
+	}
+
 	int Texture::getWidth() {
 		return mWidth;
 	}

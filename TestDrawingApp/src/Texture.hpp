@@ -16,6 +16,10 @@ namespace drawApp {
 			void render(SDL_Renderer* ren, SDL_Rect* src, SDL_Rect* dest);
 			void setAsRenderTarget(SDL_Renderer* ren);
 
+			void setBlendMode(SDL_BlendMode blending);
+			void setColor(Uint8 r, Uint8 g, Uint8 b);
+			void setAlpha(Uint8 alpha);
+
 			int getWidth();
 			int getHeight();
 
