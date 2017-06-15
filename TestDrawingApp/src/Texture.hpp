@@ -20,6 +20,11 @@ namespace drawApp {
 			void setColor(Uint8 r, Uint8 g, Uint8 b);
 			void setAlpha(Uint8 alpha);
 
+			Uint8 getRed() const;
+			Uint8 getGreen() const;
+			Uint8 getBlue() const;
+			Uint8 getAlpha() const;
+
 			int getWidth();
 			int getHeight();
 
@@ -37,6 +42,8 @@ namespace drawApp {
 			SDL_Texture* mTexture;
 			void* mPixels;
 			int mPitch;
+
+			Uint8 red, green, blue, alpha;
 
 			//Image dimensions
 			int mWidth;

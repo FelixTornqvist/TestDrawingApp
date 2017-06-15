@@ -17,7 +17,12 @@ namespace drawApp {
 			throw std::runtime_error(SDL_GetError());
 		}
 
-		if ( SDL_CreateWindowAndRenderer(possize.w, possize.h, 0, &win, &ren) == -1) {
+		win = SDL_CreateWindow(title.c_str(), possize.x, possize.y, possize.w, possize.h, SDL_WINDOW_RESIZABLE );
+		if (win == nullptr) {
+			throw std::runtime_error(SDL_GetError());
+		}
+		ren = SDL_CreateRenderer(win, -1, 0);
+		if (ren == nullptr) {
 			throw std::runtime_error(SDL_GetError());
 		}
 	}
@@ -38,7 +43,13 @@ namespace drawApp {
 		rootElement->draw(ren);
 		SDL_RenderPresent(ren);
 
-		SDL_Delay(1000/60);
+//		SDL_Delay(1000/60);
+	}
+
+	void Window::notifyResize(int width, int height) {
+		rootElement->setWidth(width - 20);
+		rootElement->setHeight(height - 20);
+		rootElement->updateChildSizes();
 	}
 
 	void Window::updateMouseEvents() {
@@ -73,6 +84,16 @@ namespace drawApp {
 	void Window::setRootElement(UIElement* ele) {
 		rootElement = ele;
 		hoveredElement = rootElement;
+	}
+
+	void Window::setScaling(float scale) {
+		SDL_RenderSetScale(ren, scale, scale);
+	}
+
+	float Window::getScaling() {
+		float ret = 0, no;
+		SDL_RenderGetScale(ren, &ret, &no);
+		return ret;
 	}
 
 	SDL_Renderer* Window::getRenderer() {

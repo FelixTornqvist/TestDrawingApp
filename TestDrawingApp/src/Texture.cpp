@@ -11,11 +11,13 @@ namespace drawApp {
 		mPitch = 0;
 		mWidth = 0;
 		mHeight = 0;
+		red = green = blue = alpha = 255;
 	}
 
 	Texture::~Texture() {
 		SDL_DestroyTexture(mTexture);
 	}
+
 	Texture* Texture::createFromFile(std::string path, SDL_Renderer* ren) {
 		SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
 
@@ -88,11 +90,33 @@ namespace drawApp {
 
 	void Texture::setColor( Uint8 r, Uint8 g, Uint8 b ) {
 		SDL_SetTextureColorMod(mTexture, r, g, b);
+		red = r;
+		green = g;
+		blue = b;
 	}
 
-	void Texture::setAlpha(Uint8 alpha) {
-		SDL_SetTextureAlphaMod(mTexture, alpha);
+	void Texture::setAlpha(Uint8 a) {
+		SDL_SetTextureAlphaMod(mTexture, a);
+		alpha = a;
 	}
+
+	Uint8 Texture::getRed() const {
+		return red;
+	}
+
+	Uint8 Texture::getGreen() const {
+		return green;
+	}
+
+	Uint8 Texture::getBlue() const {
+		return blue;
+	}
+
+	Uint8 Texture::getAlpha() const {
+		return alpha;
+	}
+
+
 
 	int Texture::getWidth() {
 		return mWidth;

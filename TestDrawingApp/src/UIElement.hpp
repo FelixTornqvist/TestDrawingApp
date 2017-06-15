@@ -19,6 +19,7 @@ namespace drawApp {
 
 			UIElement* findChildAt(SDL_Point& pos);
 			void draw(SDL_Renderer* ren);
+			virtual void updateChildSizes() = 0;
 
 			int getX() const;
 			int getY() const;

@@ -14,15 +14,11 @@ namespace drawApp {
 		lastPos = {0,0};
 		currPos = {0,0};
 		contentSrc = {0,0, content->getWidth(), content->getHeight()};
-		content->setAsRenderTarget(ren);
-		SDL_SetRenderDrawColor(ren, 255,255,255,255);
-		SDL_RenderClear(ren);
-		SDL_SetRenderDrawColor(ren, 0,0,0,255);
-		SDL_SetRenderTarget(ren, NULL);
+		clearCanvas(ren);
 	}
 
 	Canvas::~Canvas() {
-		//dtor
+		delete content;
 	}
 
 	void Canvas::drawMe(SDL_Renderer* ren) {
@@ -87,6 +83,15 @@ namespace drawApp {
 		SDL_SetRenderTarget(ren, NULL);
 	}
 
+	void Canvas::clearCanvas(SDL_Renderer* ren) {
+		content->setAsRenderTarget(ren);
+		SDL_SetRenderDrawColor(ren, 255,255,255,255);
+		SDL_RenderClear(ren);
+		SDL_SetRenderDrawColor(ren, 0,0,0,255);
+		SDL_SetRenderTarget(ren, NULL);
+	}
+
+
 	void Canvas::setBrush(Texture* tex) {
 		brush = tex;
 		brushDest = {0, 0, 10,10};
@@ -99,6 +104,10 @@ namespace drawApp {
 
 	void Canvas::setBrushSkippedPixels(int skippedPixels) {
 		brushSkippedPixels = skippedPixels > 0 ? skippedPixels : 1;
+	}
+
+	int Canvas::getBrushSize() const {
+		return brushDest.w;
 	}
 
 	SDL_Point Canvas::convertGlobalToLocal(SDL_Point p) {

@@ -13,6 +13,10 @@ namespace drawApp {
 
 			void update();
 			void setRootElement(UIElement* ele);
+			void setScaling(float scale);
+			float getScaling();
+
+			void notifyResize(int width, int height);
 
 			SDL_Renderer* getRenderer();
 

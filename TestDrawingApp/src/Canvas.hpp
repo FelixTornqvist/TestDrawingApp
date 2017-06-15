@@ -18,10 +18,14 @@ namespace drawApp {
 
 			void drawLine(SDL_Point from, SDL_Point to, int skippedPixels, SDL_Renderer* ren);
 			virtual void drawMe(SDL_Renderer* ren) override;
+			void clearCanvas(SDL_Renderer* ren);
+
+			virtual void updateChildSizes() {}
 
 			void setBrush(Texture* tex);
 			void setBrushSize(int radius);
 			void setBrushSkippedPixels(int skippedPixels);
+			int getBrushSize() const;
 
 			SDL_Point convertGlobalToLocal(SDL_Point p);
 
