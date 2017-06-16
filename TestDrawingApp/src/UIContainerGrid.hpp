@@ -7,6 +7,7 @@
 namespace drawApp {
 	class UIContainerGrid : public UIElement {
 		public:
+			static UIContainerGrid* getInstance(int _rowCols, bool orderByCols, int _childSize);
 			static UIContainerGrid* getInstance(const SDL_Rect& bounds, int _rowCols, bool orderByCols, int _childSize);
 			virtual ~UIContainerGrid();
 

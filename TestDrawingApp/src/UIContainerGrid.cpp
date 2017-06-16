@@ -4,6 +4,11 @@
 #include "UIContainerGrid.hpp"
 
 namespace drawApp {
+
+	UIContainerGrid* UIContainerGrid::getInstance(int _rowCols, bool _orderByCols, int _childSize) {
+		return new UIContainerGrid({0,0,0,0}, _rowCols, _orderByCols, _childSize);
+	}
+
 	UIContainerGrid* UIContainerGrid::getInstance(const SDL_Rect& bounds, int _rowCols, bool _orderByCols, int _childSize) {
 		return new UIContainerGrid(bounds, _rowCols, _orderByCols, _childSize);
 	}

@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -6,10 +7,14 @@
 #include <SDL_mixer.h>
 
 #include "Window.hpp"
+#include "UIButton.hpp"
 
 namespace drawApp {
 	Window* Window::getInstance(std::string title, SDL_Rect possize) {
-		return new Window(title, possize);
+		Window* ret = new Window(title, possize);
+
+		UIButton::loadDefaulTexture(ret->getRenderer());
+		return ret;
 	}
 
 	Window::Window(std::string title, SDL_Rect possize) {
@@ -43,18 +48,25 @@ namespace drawApp {
 		rootElement->draw(ren);
 		SDL_RenderPresent(ren);
 
-//		SDL_Delay(1000/60);
+		SDL_Delay(1000/60);
 	}
 
 	void Window::notifyResize(int width, int height) {
-		rootElement->setWidth(width - 20);
-		rootElement->setHeight(height - 20);
+		width /= getScaling();
+		height /= getScaling();
+
+		rootElement->setX(0);
+		rootElement->setY(0);
+		rootElement->setWidth(width);
+		rootElement->setHeight(height);
 		rootElement->updateChildSizes();
 	}
 
 	void Window::updateMouseEvents() {
 		SDL_Point mPos;
 		Uint32 button = SDL_GetMouseState(&(mPos.x), &(mPos.y));
+		mPos.x /= getScaling();
+		mPos.y /= getScaling();
 
 		if (button != 0) {
 			if (clickedElement == nullptr) {
@@ -88,6 +100,10 @@ namespace drawApp {
 
 	void Window::setScaling(float scale) {
 		SDL_RenderSetScale(ren, scale, scale);
+
+		int w, h;
+		SDL_GetWindowSize(win, &w, &h);
+		notifyResize(w, h);
 	}
 
 	float Window::getScaling() {

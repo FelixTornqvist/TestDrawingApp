@@ -6,8 +6,12 @@
 
 #include "Window.hpp"
 #include "UIElement.hpp"
+#include "UIButton.hpp"
 #include "UIContainerGrid.hpp"
 #include "Canvas.hpp"
+
+#define WIDTH 640
+#define HEIGHT 480
 
 using namespace drawApp;
 using namespace std;
@@ -17,7 +21,9 @@ UIElement* rootElement;
 
 class TestUIElement: public UIElement {
 	public:
-		TestUIElement(): UIElement({0,0,0,0}) {}
+		TestUIElement(): UIElement( {
+			0,0,0,0
+		}) {}
 		TestUIElement(const SDL_Rect& pos): UIElement(pos) {}
 
 		void mouseDown(Uint32 btn, SDL_Point& pos) {
@@ -49,7 +55,7 @@ class TestUIElement: public UIElement {
 				child1->setX(getX());
 				child1->setY(getY());
 				child1->setHeight(getHeight());
-				child1->setWidth(50);
+				child1->setWidth(100);
 				child1->updateChildSizes();
 			}
 		}
@@ -79,30 +85,36 @@ void Quit() {
 	printf("Exited cleanly\n");
 }
 
+void tryMe() {
+	cout << "hello, button" << endl;
+}
+
 int main ( int argc, char** argv ) {
 	atexit(Quit);
 
-	window = Window::getInstance("Hello World!", {100,100,640,480});
+	window = Window::getInstance("Hello World!", {100,100,WIDTH,HEIGHT});
 	rootElement = new TestUIElement({10,10,620*2,460*2});
 	window->setRootElement(rootElement);
 
 	Canvas* canvas = Canvas::getInstance({20,20, 600, 440}, 600,440, window->getRenderer());
-	Texture* testBrush = Texture::createFromFile("brush.png", window->getRenderer());
+	Texture* testBrush = Texture::createFromFile("res/brush.png", window->getRenderer());
 	testBrush->setBlendMode(SDL_BLENDMODE_BLEND);
 	canvas->setBrush(testBrush);
 
-	UIContainerGrid* grid = UIContainerGrid::getInstance({20, 20, 100,100}, 2, true, 20);
+	UIContainerGrid* grid = UIContainerGrid::getInstance(2, true, 32);
 	grid->setXSpacing(5);
 	grid->setYSpacing(5);
-	grid->addChild(new TestUIElement());
-	grid->addChild(new TestUIElement());
-	grid->addChild(new TestUIElement());
-	grid->addChild(new TestUIElement());
-	grid->addChild(new TestUIElement());
+	grid->addChild(UIButton::getInstance("b1", &tryMe));
+	grid->addChild(UIButton::getInstance("b2", &tryMe));
+	grid->addChild(UIButton::getInstance("b3", &tryMe));
+	grid->addChild(UIButton::getInstance("b4", &tryMe));
+	grid->addChild(UIButton::getInstance("b5", &tryMe));
+	grid->addChild(UIButton::getInstance("b6", &tryMe));
 	grid->orderChildren();
 
 //	rootElement->addChild(canvas);
 	rootElement->addChild(grid);
+	window->notifyResize(WIDTH, HEIGHT);
 
 	bool done = false;
 	while (!done) {
@@ -140,7 +152,6 @@ int main ( int argc, char** argv ) {
 				case SDL_WINDOWEVENT:
 					switch (event.window.event) {
 						case SDL_WINDOWEVENT_RESIZED:
-							cout << "resized" << endl;
 							window->notifyResize(event.window.data1, event.window.data2);
 							break;
 					}
