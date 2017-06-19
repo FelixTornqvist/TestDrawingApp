@@ -8,6 +8,7 @@
 #include "UIElement.hpp"
 #include "UIButton.hpp"
 #include "UIContainerGrid.hpp"
+#include "RootLayout.hpp"
 #include "Canvas.hpp"
 
 #define WIDTH 640
@@ -55,7 +56,7 @@ class TestUIElement: public UIElement {
 				child1->setX(getX());
 				child1->setY(getY());
 				child1->setHeight(getHeight());
-				child1->setWidth(100);
+				child1->setWidth(64 + 15);
 				child1->updateChildSizes();
 			}
 		}
@@ -93,27 +94,9 @@ int main ( int argc, char** argv ) {
 	atexit(Quit);
 
 	window = Window::getInstance("Hello World!", {100,100,WIDTH,HEIGHT});
-	rootElement = new TestUIElement({10,10,620*2,460*2});
+	rootElement = RootLayout::getInstance(window);
 	window->setRootElement(rootElement);
 
-	Canvas* canvas = Canvas::getInstance({20,20, 600, 440}, 600,440, window->getRenderer());
-	Texture* testBrush = Texture::createFromFile("res/brush.png", window->getRenderer());
-	testBrush->setBlendMode(SDL_BLENDMODE_BLEND);
-	canvas->setBrush(testBrush);
-
-	UIContainerGrid* grid = UIContainerGrid::getInstance(2, true, 32);
-	grid->setXSpacing(5);
-	grid->setYSpacing(5);
-	grid->addChild(UIButton::getInstance("b1", &tryMe));
-	grid->addChild(UIButton::getInstance("b2", &tryMe));
-	grid->addChild(UIButton::getInstance("b3", &tryMe));
-	grid->addChild(UIButton::getInstance("b4", &tryMe));
-	grid->addChild(UIButton::getInstance("b5", &tryMe));
-	grid->addChild(UIButton::getInstance("b6", &tryMe));
-	grid->orderChildren();
-
-//	rootElement->addChild(canvas);
-	rootElement->addChild(grid);
 	window->notifyResize(WIDTH, HEIGHT);
 
 	bool done = false;
@@ -137,17 +120,11 @@ int main ( int argc, char** argv ) {
 						case SDLK_DOWN:
 							window->setScaling(window->getScaling() - 0.25f);
 							break;
-						case SDLK_DELETE:
-						case SDLK_BACKSPACE:
-							canvas->clearCanvas(window->getRenderer());
-							break;
 
 					}
 					break;
 				case SDL_MOUSEWHEEL:
-					testBrush->setAlpha(testBrush->getAlpha() + event.wheel.y);
-					canvas->setBrushSize(canvas->getBrushSize() + event.wheel.x);
-					cout << "Alpha: " << (int) testBrush->getAlpha() << " Size: " << canvas->getBrushSize() << endl;
+					window->notifyScroll(event.wheel.x, event.wheel.y);
 					break;
 				case SDL_WINDOWEVENT:
 					switch (event.window.event) {
@@ -162,8 +139,6 @@ int main ( int argc, char** argv ) {
 		window->update();
 
 	}
-
-	delete testBrush;
 
 	return 0;
 }

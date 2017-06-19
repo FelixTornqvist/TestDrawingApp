@@ -17,6 +17,7 @@ namespace drawApp {
 			float getScaling();
 
 			void notifyResize(int width, int height);
+			void notifyScroll(int x, int y);
 
 			SDL_Renderer* getRenderer();
 

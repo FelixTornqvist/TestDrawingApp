@@ -12,15 +12,16 @@ namespace drawApp {
 			static Canvas* getInstance(const SDL_Rect& bounds, int width, int height, SDL_Renderer* ren);
 			virtual ~Canvas();
 
-			void mouseDown(Uint32 btn, SDL_Point& pos);
-			void mouseDragged(Uint32 btn, SDL_Point& pos);
-			void mouseUp(SDL_Point& pos);
+			void mouseDown(Uint32 btn, SDL_Point& pos) override;
+			void mouseDragged(Uint32 btn, SDL_Point& pos) override;
+			void mouseUp(SDL_Point& pos) override;
+			void mouseScroll(SDL_Point& mPos, int x, int y) override;
 
 			void drawLine(SDL_Point from, SDL_Point to, int skippedPixels, SDL_Renderer* ren);
 			virtual void drawMe(SDL_Renderer* ren) override;
 			void clearCanvas(SDL_Renderer* ren);
 
-			virtual void updateChildSizes() {}
+			virtual void updateChildSizes() override;
 
 			void setBrush(Texture* tex);
 			void setBrushSize(int radius);
@@ -35,11 +36,15 @@ namespace drawApp {
 		private:
 			Texture *content, *brush = nullptr;
 			SDL_Rect brushDest;
-			SDL_Rect contentSrc;
+			SDL_Rect contentDest;
+			SDL_Point zoomCenter;
+			float zoomFactor;
 
 			int brushSkippedPixels = 1;
 			bool brushDown = false;
 			SDL_Point lastPos, currPos;
+
+			void updateZoom();
 	};
 }
 

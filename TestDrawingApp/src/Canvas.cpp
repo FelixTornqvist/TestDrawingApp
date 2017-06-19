@@ -13,7 +13,9 @@ namespace drawApp {
 		content = Texture::createBlank(width, height, ren, SDL_TEXTUREACCESS_TARGET);
 		lastPos = {0,0};
 		currPos = {0,0};
-		contentSrc = {0,0, content->getWidth(), content->getHeight()};
+		contentDest = bounds;
+		zoomCenter = {width / 2, height / 2};
+		zoomFactor = 1;
 		clearCanvas(ren);
 	}
 
@@ -24,7 +26,23 @@ namespace drawApp {
 	void Canvas::drawMe(SDL_Renderer* ren) {
 		if (brushDown)
 			drawLine(lastPos, currPos, brushSkippedPixels, ren);
-		content->render(ren, &contentSrc, &bounds);
+		content->render(ren, NULL, &contentDest);
+	}
+
+	void Canvas::updateChildSizes() {
+		std::cout << "updating" << std::endl;
+		updateZoom();
+	}
+
+	void Canvas::updateZoom() {
+		SDL_Point scaledZoomCenter = zoomCenter;
+		scaledZoomCenter.x *= zoomFactor;
+		scaledZoomCenter.y *= zoomFactor;
+
+		contentDest.x = bounds.x + (bounds.w / 2) - scaledZoomCenter.x;
+		contentDest.y = bounds.y + (bounds.h / 2) - scaledZoomCenter.y;
+		contentDest.w = content->getWidth() * zoomFactor;
+		contentDest.h = content->getHeight() * zoomFactor;
 	}
 
 	void Canvas::mouseDown(Uint32 btn, SDL_Point& pos) {
@@ -40,6 +58,20 @@ namespace drawApp {
 			lastPos = currPos;
 			currPos = convertGlobalToLocal(pos);
 		}
+	}
+
+	void Canvas::mouseScroll(SDL_Point& mPos, int x, int y) {
+		float speed = 0.05;
+		zoomFactor += speed * y;
+		mPos = convertGlobalToLocal(mPos);
+		if (y > 0) {
+			zoomCenter.x += (mPos.x - zoomCenter.x) * speed;
+			zoomCenter.y += (mPos.y - zoomCenter.y) * speed;
+		} else if (y < 0) {
+			zoomCenter.x -= (mPos.x - zoomCenter.x) * speed;
+			zoomCenter.y -= (mPos.y - zoomCenter.y) * speed;
+		}
+		updateZoom();
 	}
 
 	void Canvas::mouseUp(SDL_Point& pos) {
@@ -111,8 +143,10 @@ namespace drawApp {
 	}
 
 	SDL_Point Canvas::convertGlobalToLocal(SDL_Point p) {
-		p.x -= bounds.x;
-		p.y -= bounds.y;
+		p.x -= contentDest.x;
+		p.y -= contentDest.y;
+		p.x = ((content->getWidth() * 1.0) / contentDest.w) * p.x;
+		p.y = ((content->getHeight() * 1.0) / contentDest.h) * p.y;
 		return p;
 	}
 

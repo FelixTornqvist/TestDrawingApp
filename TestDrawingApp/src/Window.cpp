@@ -62,6 +62,15 @@ namespace drawApp {
 		rootElement->updateChildSizes();
 	}
 
+	void Window::notifyScroll(int x, int y) {
+		SDL_Point mPos;
+		Uint32 button = SDL_GetMouseState(&(mPos.x), &(mPos.y));
+		mPos.x /= getScaling();
+		mPos.y /= getScaling();
+		UIElement* hoverOver = rootElement->findChildAt(mPos);
+		hoverOver->mouseScroll(mPos, x, y);
+	}
+
 	void Window::updateMouseEvents() {
 		SDL_Point mPos;
 		Uint32 button = SDL_GetMouseState(&(mPos.x), &(mPos.y));

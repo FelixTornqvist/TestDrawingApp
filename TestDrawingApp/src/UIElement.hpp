@@ -16,6 +16,7 @@ namespace drawApp {
 			virtual void mouseUp(SDL_Point& pos) {};
 			virtual void mouseHoverOn(SDL_Point& pos) {};
 			virtual void mouseHoverOff() {};
+			virtual void mouseScroll(SDL_Point& mPos, int x, int y) {}
 
 			UIElement* findChildAt(SDL_Point& pos);
 			void draw(SDL_Renderer* ren);
