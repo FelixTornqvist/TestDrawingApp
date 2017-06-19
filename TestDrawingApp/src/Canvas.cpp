@@ -61,16 +61,24 @@ namespace drawApp {
 	}
 
 	void Canvas::mouseScroll(SDL_Point& mPos, int x, int y) {
-		float speed = 0.05;
-		zoomFactor += speed * y;
-		mPos = convertGlobalToLocal(mPos);
-		if (y > 0) {
-			zoomCenter.x += (mPos.x - zoomCenter.x) * speed;
-			zoomCenter.y += (mPos.y - zoomCenter.y) * speed;
-		} else if (y < 0) {
-			zoomCenter.x -= (mPos.x - zoomCenter.x) * speed;
-			zoomCenter.y -= (mPos.y - zoomCenter.y) * speed;
+		float zoomSpeed = 0.05;
+		float scrollSpeed = 10;
+
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_LCTRL]) {
+			zoomFactor *= (1 + (y > 0? zoomSpeed : -zoomSpeed));
+			mPos = convertGlobalToLocal(mPos);
+			if (y > 0) {
+				zoomCenter.x += (mPos.x - zoomCenter.x) * zoomSpeed;
+				zoomCenter.y += (mPos.y - zoomCenter.y) * zoomSpeed;
+			} else if (y < 0) {
+				zoomCenter.x -= (mPos.x - zoomCenter.x) * zoomSpeed;
+				zoomCenter.y -= (mPos.y - zoomCenter.y) * zoomSpeed;
+			}
+		} else {
+			zoomCenter.x -= x * scrollSpeed;
+			zoomCenter.y -= y * scrollSpeed;
 		}
+
 		updateZoom();
 	}
 
