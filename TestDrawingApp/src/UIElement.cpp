@@ -28,6 +28,36 @@ namespace drawApp {
 		children.push_back(child);
 	}
 
+	bool UIElement::mouseFingerUsed = false;
+	SDL_FingerID UIElement::mouseFinger = NULL;
+
+	void UIElement::fingerDown(SDL_Point& fPos, SDL_FingerID fingerId, float pressure) {
+		if (!mouseFingerUsed) {
+			mouseDown(SDL_BUTTON(SDL_BUTTON_LEFT), fPos);
+			mouseFingerUsed = true;
+			mouseFinger = fingerId;
+		}
+	}
+
+	void UIElement::fingerDragged(SDL_Point& fPos, SDL_FingerID fingerId, float pressure) {
+		if (mouseFingerUsed && fingerId == mouseFinger) {
+			mouseDragged(SDL_BUTTON(SDL_BUTTON_LEFT), fPos);
+		}
+	}
+
+	void UIElement::fingerUp(SDL_Point& fPos, SDL_FingerID fingerId, float pressure) {
+		if (mouseFingerUsed && fingerId == mouseFinger) {
+			mouseUp(fPos);
+			mouseFingerUsed = false;
+			mouseFinger = NULL;
+		}
+	}
+
+	void UIElement::multigesture(SDL_Point& fPos, float dRot, float dDist, Uint16 fingers) {
+
+	}
+
+
 
 	int UIElement::getX() const {
 		return bounds.x;

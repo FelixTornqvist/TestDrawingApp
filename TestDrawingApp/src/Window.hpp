@@ -19,7 +19,14 @@ namespace drawApp {
 			void notifyResize(int width, int height);
 			void notifyScroll(int x, int y);
 
+			void notifyFingerDown(SDL_TouchFingerEvent& fEve);
+			void notifyFingerMotion(SDL_TouchFingerEvent& fEve);
+			void notifyFingerUp(SDL_TouchFingerEvent& fEve);
+
+			void notifyMultigesture(SDL_MultiGestureEvent& mgEve);
+
 			SDL_Renderer* getRenderer();
+			void getSize(int* w, int* h);
 
 		protected:
 			Window(std::string title, SDL_Rect possize);
@@ -32,6 +39,7 @@ namespace drawApp {
 			UIElement* hoveredElement = nullptr;
 
 			void updateMouseEvents();
+			void notifyFinger(SDL_TouchFingerEvent& fEve, void (UIElement::*notifyFunc)(SDL_Point&, SDL_FingerID, float));
 	};
 }
 

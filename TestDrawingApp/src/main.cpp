@@ -132,6 +132,20 @@ int main ( int argc, char** argv ) {
 							window->notifyResize(event.window.data1, event.window.data2);
 							break;
 					}
+					break;
+				case SDL_FINGERDOWN:
+					window->notifyFingerDown(event.tfinger);
+					break;
+				case SDL_FINGERMOTION:
+					window->notifyFingerMotion(event.tfinger);
+					break;
+				case SDL_FINGERUP:
+					window->notifyFingerUp(event.tfinger);
+					break;
+				case SDL_MULTIGESTURE:
+					window->notifyMultigesture(event.mgesture);
+					break;
+
 
 			}
 		}

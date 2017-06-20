@@ -71,6 +71,32 @@ namespace drawApp {
 		hoverOver->mouseScroll(mPos, x, y);
 	}
 
+	void Window::notifyMultigesture(SDL_MultiGestureEvent& mgEve) {
+		SDL_Point mgPos = {mgEve.x, mgEve.y};
+		UIElement* gestureEle = rootElement->findChildAt(mgPos);
+		gestureEle->multigesture(mgPos, mgEve.dTheta, mgEve.dDist, mgEve.numFingers);
+	}
+
+	void Window::notifyFingerDown(SDL_TouchFingerEvent& fEve) {
+		notifyFinger(fEve, &UIElement::fingerDown);
+	}
+
+	void Window::notifyFingerMotion(SDL_TouchFingerEvent& fEve) {
+		notifyFinger(fEve, &UIElement::fingerDragged);
+	}
+
+	void Window::notifyFingerUp(SDL_TouchFingerEvent& fEve) {
+		notifyFinger(fEve, &UIElement::fingerUp);
+	}
+
+	void Window::notifyFinger(SDL_TouchFingerEvent& fEve, void(UIElement::* notifyFunc)(SDL_Point&, SDL_FingerID, float)) {
+		SDL_Point fPos = {fEve.x, fEve.y};
+
+		UIElement* touchedEle = rootElement->findChildAt(fPos);
+		(touchedEle->*notifyFunc)(fPos, fEve.fingerId, fEve.pressure);
+	}
+
+
 	void Window::updateMouseEvents() {
 		SDL_Point mPos;
 		Uint32 button = SDL_GetMouseState(&(mPos.x), &(mPos.y));
@@ -124,5 +150,10 @@ namespace drawApp {
 	SDL_Renderer* Window::getRenderer() {
 		return ren;
 	}
+
+	void Window::getSize(int* w, int* h) {
+		SDL_GetWindowSize(win, w, h);
+	}
+
 
 }

@@ -9,7 +9,7 @@ namespace drawApp {
 		return new Canvas(bounds, width, height, ren);
 	}
 
-	Canvas::Canvas(const SDL_Rect& bounds, int width, int height, SDL_Renderer* ren): UIElement(bounds) {
+	Canvas::Canvas(const SDL_Rect& bounds, int width, int height, SDL_Renderer* _ren): UIElement(bounds), ren(_ren) {
 		content = Texture::createBlank(width, height, ren, SDL_TEXTUREACCESS_TARGET);
 		lastPos = {0,0};
 		currPos = {0,0};
@@ -24,13 +24,10 @@ namespace drawApp {
 	}
 
 	void Canvas::drawMe(SDL_Renderer* ren) {
-		if (brushDown)
-			drawLine(lastPos, currPos, brushSkippedPixels, ren);
 		content->render(ren, NULL, &contentDest);
 	}
 
 	void Canvas::updateChildSizes() {
-		std::cout << "updating" << std::endl;
 		updateZoom();
 	}
 
@@ -57,7 +54,12 @@ namespace drawApp {
 		if (btn & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 			lastPos = currPos;
 			currPos = convertGlobalToLocal(pos);
+			drawLine(lastPos, currPos, brushSkippedPixels, ren);
 		}
+	}
+
+	void Canvas::mouseUp(SDL_Point& pos) {
+		brushDown = false;
 	}
 
 	void Canvas::mouseScroll(SDL_Point& mPos, int x, int y) {
@@ -82,9 +84,13 @@ namespace drawApp {
 		updateZoom();
 	}
 
-	void Canvas::mouseUp(SDL_Point& pos) {
-		brushDown = false;
+	void Canvas::multigesture(SDL_Point& fPos, float dRot, float dDist, Uint16 fingers) {
+		SDL_Log("multigesture rot:%f dist:%f fingers:%d", dRot, dDist, fingers);
+		zoomFactor += dDist * 0.005;
+		zoomCenter = fPos;
+		updateZoom();
 	}
+
 
 	void Canvas::drawLine(SDL_Point from, SDL_Point to, int skippedPixels, SDL_Renderer* ren) {
 		int xDiff = std::abs(from.x - to.x);
