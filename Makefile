@@ -15,7 +15,8 @@ all: native wasm
 wasm: index.js
 
 index.js: $(SRC)
-	emcc $(SRC) -Wall -s ALLOW_MEMORY_GROWTH=1 -s WASM=1 -std=c++11 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -Iinclude/ -O3 -o index.js --preload-file res/ --use-preload-plugins
+	# -g4 --source-map-base http://localhost:8080/  added to enable debugging in browser
+	emcc $(SRC) -Wall -s ALLOW_MEMORY_GROWTH=1 -s WASM=1 -std=c++11 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -Iinclude/ -O3 -o index.js --preload-file res/ --use-preload-plugins -g4 --source-map-base http://localhost:8080/
 
 native: build/Draw
 

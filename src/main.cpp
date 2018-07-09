@@ -5,6 +5,8 @@
 
 #ifndef __EMSCRIPTEN__
 #include <SDL_mixer.h>
+#else
+#include <emscripten.h>
 #endif
 
 
@@ -21,6 +23,7 @@
 using namespace drawApp;
 using namespace std;
 
+bool running = true;
 Window* window;
 UIElement* rootElement;
 
@@ -94,6 +97,59 @@ void tryMe() {
 	cout << "hello, button" << endl;
 }
 
+void tick() {
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+
+		switch (event.type) {
+			case SDL_QUIT:
+				running = false;
+				break;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+					case SDLK_RETURN:
+					case SDLK_ESCAPE:
+						running = false;
+						break;
+					case SDLK_UP:
+						window->setScaling(window->getScaling() + 0.25f);
+						break;
+					case SDLK_DOWN:
+						window->setScaling(window->getScaling() - 0.25f);
+						break;
+
+				}
+				break;
+			case SDL_MOUSEWHEEL:
+				window->notifyScroll(event.wheel.x, event.wheel.y);
+				break;
+			case SDL_WINDOWEVENT:
+				switch (event.window.event) {
+					case SDL_WINDOWEVENT_RESIZED:
+						window->notifyResize(event.window.data1, event.window.data2);
+						break;
+				}
+				break;
+			case SDL_FINGERDOWN:
+				window->notifyFingerDown(event.tfinger);
+				break;
+			case SDL_FINGERMOTION:
+				window->notifyFingerMotion(event.tfinger);
+				break;
+			case SDL_FINGERUP:
+				window->notifyFingerUp(event.tfinger);
+				break;
+			case SDL_MULTIGESTURE:
+				window->notifyMultigesture(event.mgesture);
+				break;
+
+
+		}
+	}
+
+	window->update();
+}
+
 int main ( int argc, char** argv ) {
 	atexit(Quit);
 
@@ -103,60 +159,14 @@ int main ( int argc, char** argv ) {
 
 	window->notifyResize(WIDTH, HEIGHT);
 
-	bool done = false;
-	while (!done) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-
-			switch (event.type) {
-				case SDL_QUIT:
-					done = true;
-					break;
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-						case SDLK_RETURN:
-						case SDLK_ESCAPE:
-							done = true;
-							break;
-						case SDLK_UP:
-							window->setScaling(window->getScaling() + 0.25f);
-							break;
-						case SDLK_DOWN:
-							window->setScaling(window->getScaling() - 0.25f);
-							break;
-
-					}
-					break;
-				case SDL_MOUSEWHEEL:
-					window->notifyScroll(event.wheel.x, event.wheel.y);
-					break;
-				case SDL_WINDOWEVENT:
-					switch (event.window.event) {
-						case SDL_WINDOWEVENT_RESIZED:
-							window->notifyResize(event.window.data1, event.window.data2);
-							break;
-					}
-					break;
-				case SDL_FINGERDOWN:
-					window->notifyFingerDown(event.tfinger);
-					break;
-				case SDL_FINGERMOTION:
-					window->notifyFingerMotion(event.tfinger);
-					break;
-				case SDL_FINGERUP:
-					window->notifyFingerUp(event.tfinger);
-					break;
-				case SDL_MULTIGESTURE:
-					window->notifyMultigesture(event.mgesture);
-					break;
-
-
-			}
-		}
-
-		window->update();
-
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(&tick, 0, 1);
+#else
+	while (running) {
+		tick();
+		SDL_Delay(1000/60);
 	}
+#endif
 
 	return 0;
 }

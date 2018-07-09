@@ -52,8 +52,6 @@ namespace drawApp {
 		SDL_RenderClear(ren);
 		rootElement->draw(ren);
 		SDL_RenderPresent(ren);
-
-		SDL_Delay(1000/60);
 	}
 
 	void Window::notifyResize(int width, int height) {
@@ -95,7 +93,15 @@ namespace drawApp {
 	}
 
 	void Window::notifyFinger(SDL_TouchFingerEvent& fEve, void(UIElement::* notifyFunc)(SDL_Point&, SDL_FingerID, float)) {
+#ifndef __EMSCRIPTEN__
 		SDL_Point fPos = {static_cast<int>(fEve.x), static_cast<int>(fEve.y)};
+#else
+		int w, h;
+		getSize(&w, &h);
+		SDL_Point fPos = {static_cast<int>(w * fEve.x), static_cast<int>(h * fEve.y)};
+#endif
+
+		std::cout << "fpos x" << fEve.x << " y"<< fEve.y << std::endl;
 
 		UIElement* touchedEle = rootElement->findChildAt(fPos);
 		(touchedEle->*notifyFunc)(fPos, fEve.fingerId, fEve.pressure);

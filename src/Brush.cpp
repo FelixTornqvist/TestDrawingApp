@@ -20,6 +20,9 @@ namespace drawApp {
 		int xDiff = std::abs(from.x - to.x);
 		int yDiff = std::abs(from.y - to.y);
 
+		if (xDiff == 0 && yDiff == 0)
+			return;
+
 		if (xDiff > yDiff) {
 			if (from.x > to.x) {
 				SDL_Point tmp = from;
