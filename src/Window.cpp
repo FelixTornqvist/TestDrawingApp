@@ -4,7 +4,10 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+
+#ifndef __EMSCRIPTEN__
 #include <SDL_mixer.h>
+#endif
 
 #include "Window.hpp"
 #include "UIButton.hpp"
@@ -35,7 +38,9 @@ namespace drawApp {
 	Window::~Window() {
 		SDL_DestroyRenderer(ren);
 		SDL_DestroyWindow(win);
+#ifndef __EMSCRIPTEN__
 		Mix_Quit();
+#endif
 		TTF_Quit();
 		IMG_Quit();
 		SDL_Quit();
@@ -72,7 +77,7 @@ namespace drawApp {
 	}
 
 	void Window::notifyMultigesture(SDL_MultiGestureEvent& mgEve) {
-		SDL_Point mgPos = {mgEve.x, mgEve.y};
+		SDL_Point mgPos = {static_cast<int>(mgEve.x), static_cast<int>(mgEve.y)};
 		UIElement* gestureEle = rootElement->findChildAt(mgPos);
 		gestureEle->multigesture(mgPos, mgEve.dTheta, mgEve.dDist, mgEve.numFingers);
 	}
@@ -90,7 +95,7 @@ namespace drawApp {
 	}
 
 	void Window::notifyFinger(SDL_TouchFingerEvent& fEve, void(UIElement::* notifyFunc)(SDL_Point&, SDL_FingerID, float)) {
-		SDL_Point fPos = {fEve.x, fEve.y};
+		SDL_Point fPos = {static_cast<int>(fEve.x), static_cast<int>(fEve.y)};
 
 		UIElement* touchedEle = rootElement->findChildAt(fPos);
 		(touchedEle->*notifyFunc)(fPos, fEve.fingerId, fEve.pressure);

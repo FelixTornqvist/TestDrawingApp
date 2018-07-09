@@ -1,8 +1,12 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_mixer.h>
 #include <SDL_ttf.h>
+
+#ifndef __EMSCRIPTEN__
+#include <SDL_mixer.h>
+#endif
+
 
 #include "Window.hpp"
 #include "UIElement.hpp"

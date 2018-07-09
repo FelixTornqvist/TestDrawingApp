@@ -1,7 +1,7 @@
 #ifndef CANVAS_HPP
 #define CANVAS_HPP
 
-#include "SDL.h"
+#include <SDL.h>
 
 #include "UIElement.hpp"
 #include "Texture.hpp"
