@@ -2,6 +2,7 @@
 
 #include "RootLayout.hpp"
 #include "UIButton.hpp"
+#include "Brush.hpp"
 
 namespace drawApp {
 
@@ -18,8 +19,7 @@ namespace drawApp {
 	}) {
 		canvas = Canvas::getInstance({0,0,0,0}, 640, 480, win->getRenderer());
 
-		Texture* brush = Texture::createFromFile("res/brush.png", win->getRenderer());
-		brush->setBlendMode(SDL_BLENDMODE_BLEND);
+		Brush* brush = Brush::getInstance("res/brush.png", win->getRenderer());
 		canvas->setBrush(brush);
 
 		tools = UIContainerGrid::getInstance(2, true, 32);

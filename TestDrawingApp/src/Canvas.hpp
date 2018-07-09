@@ -5,6 +5,7 @@
 
 #include "UIElement.hpp"
 #include "Texture.hpp"
+#include "Brush.hpp"
 
 namespace drawApp {
 	class Canvas: public UIElement {
@@ -19,16 +20,12 @@ namespace drawApp {
 
 			virtual void multigesture(SDL_Point& fPos, float dRot, float dDist, Uint16 fingers) override;
 
-			void drawLine(SDL_Point from, SDL_Point to, int skippedPixels, SDL_Renderer* ren);
 			virtual void drawMe(SDL_Renderer* ren) override;
 			void clearCanvas(SDL_Renderer* ren);
 
 			virtual void updateChildSizes() override;
 
-			void setBrush(Texture* tex);
-			void setBrushSize(int radius);
-			void setBrushSkippedPixels(int skippedPixels);
-			int getBrushSize() const;
+			void setBrush(Brush* brush);
 
 			SDL_Point convertGlobalToLocal(SDL_Point p);
 
@@ -37,15 +34,13 @@ namespace drawApp {
 
 		private:
 			SDL_Renderer* ren;
-			Texture *content, *brush = nullptr;
-			SDL_Rect brushDest;
+			Texture *content;
+			Brush *brush;
+
 			SDL_Rect contentDest;
 			SDL_Point zoomCenter;
 			float zoomFactor;
 
-			int brushSkippedPixels = 1;
-			bool brushDown = false;
-			SDL_Point lastPos, currPos;
 
 			void updateZoom();
 	};

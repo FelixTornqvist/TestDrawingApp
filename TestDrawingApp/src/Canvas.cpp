@@ -11,8 +11,6 @@ namespace drawApp {
 
 	Canvas::Canvas(const SDL_Rect& bounds, int width, int height, SDL_Renderer* _ren): UIElement(bounds), ren(_ren) {
 		content = Texture::createBlank(width, height, ren, SDL_TEXTUREACCESS_TARGET);
-		lastPos = {0,0};
-		currPos = {0,0};
 		contentDest = bounds;
 		zoomCenter = {width / 2, height / 2};
 		zoomFactor = 1;
@@ -43,23 +41,30 @@ namespace drawApp {
 	}
 
 	void Canvas::mouseDown(Uint32 btn, SDL_Point& pos) {
-		if (btn & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-			brushDown = true;
-			lastPos = convertGlobalToLocal(pos);
-			currPos = lastPos;
-		}
+		content->setAsRenderTarget(ren);
+
+		SDL_Point p = convertGlobalToLocal(pos);
+		brush->mouseDown(btn, p);
+
+		SDL_SetRenderTarget(ren, NULL);
 	}
 
 	void Canvas::mouseDragged(Uint32 btn, SDL_Point& pos) {
-		if (btn & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-			lastPos = currPos;
-			currPos = convertGlobalToLocal(pos);
-			drawLine(lastPos, currPos, brushSkippedPixels, ren);
-		}
+		content->setAsRenderTarget(ren);
+
+		SDL_Point p = convertGlobalToLocal(pos);
+		brush->mouseDragged(btn, p);
+
+		SDL_SetRenderTarget(ren, NULL);
 	}
 
 	void Canvas::mouseUp(SDL_Point& pos) {
-		brushDown = false;
+		content->setAsRenderTarget(ren);
+
+		SDL_Point p = convertGlobalToLocal(pos);
+		brush->mouseUp(p);
+
+		SDL_SetRenderTarget(ren, NULL);
 	}
 
 	void Canvas::mouseScroll(SDL_Point& mPos, int x, int y) {
@@ -91,44 +96,6 @@ namespace drawApp {
 		updateZoom();
 	}
 
-
-	void Canvas::drawLine(SDL_Point from, SDL_Point to, int skippedPixels, SDL_Renderer* ren) {
-		int xDiff = std::abs(from.x - to.x);
-		int yDiff = std::abs(from.y - to.y);
-		content->setAsRenderTarget(ren);
-
-		if (xDiff > yDiff) {
-			if (from.x > to.x) {
-				SDL_Point tmp = from;
-				from = to;
-				to = tmp;
-			}
-			float k = ((from.y - to.y) * -1.0f) / (xDiff * 1.0f);
-
-			for (int x = 0; x <= xDiff; x += skippedPixels) {
-				brushDest.y = x * k + from.y;
-				brushDest.x = from.x + x;
-				brush->render(ren, NULL, &brushDest);
-			}
-
-		} else {
-			if (from.y > to.y) {
-				SDL_Point tmp = from;
-				from = to;
-				to = tmp;
-			}
-			float k = ((from.x - to.x) * -1.0f) / (yDiff * 1.0f);
-
-			for (int y = 0; y <= yDiff; y += skippedPixels) {
-				brushDest.x = y * k + from.x;
-				brushDest.y = from.y + y;
-				brush->render(ren, NULL, &brushDest);
-			}
-		}
-
-		SDL_SetRenderTarget(ren, NULL);
-	}
-
 	void Canvas::clearCanvas(SDL_Renderer* ren) {
 		content->setAsRenderTarget(ren);
 		SDL_SetRenderDrawColor(ren, 255,255,255,255);
@@ -137,24 +104,10 @@ namespace drawApp {
 		SDL_SetRenderTarget(ren, NULL);
 	}
 
-
-	void Canvas::setBrush(Texture* tex) {
-		brush = tex;
-		brushDest = {0, 0, 10,10};
+	void Canvas::setBrush(Brush* _brush) {
+		brush = _brush;
 	}
 
-	void Canvas::setBrushSize(int radius) {
-		brushDest.w = radius;
-		brushDest.h = radius;
-	}
-
-	void Canvas::setBrushSkippedPixels(int skippedPixels) {
-		brushSkippedPixels = skippedPixels > 0 ? skippedPixels : 1;
-	}
-
-	int Canvas::getBrushSize() const {
-		return brushDest.w;
-	}
 
 	SDL_Point Canvas::convertGlobalToLocal(SDL_Point p) {
 		p.x -= contentDest.x;
