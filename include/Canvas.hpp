@@ -21,7 +21,7 @@ namespace drawApp {
 			virtual void multigesture(SDL_Point& fPos, float dRot, float dDist, Uint16 fingers) override;
 
 			virtual void drawMe(SDL_Renderer* ren) override;
-			void clearCanvas(SDL_Renderer* ren);
+			void clearCanvas();
 
 			virtual void updateChildSizes() override;
 

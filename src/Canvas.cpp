@@ -14,7 +14,7 @@ namespace drawApp {
 		contentDest = bounds;
 		zoomCenter = {width / 2, height / 2};
 		zoomFactor = 1;
-		clearCanvas(ren);
+		clearCanvas();
 	}
 
 	Canvas::~Canvas() {
@@ -96,7 +96,7 @@ namespace drawApp {
 		updateZoom();
 	}
 
-	void Canvas::clearCanvas(SDL_Renderer* ren) {
+	void Canvas::clearCanvas() {
 		content->setAsRenderTarget(ren);
 		SDL_SetRenderDrawColor(ren, 255,255,255,255);
 		SDL_RenderClear(ren);
