@@ -1,6 +1,9 @@
+bin/
+obj/
+TestDrawingApp.depend
+TestDrawingApp.layout
 
-*.cbp
-
-TestDrawingApp/TestDrawingApp\.cscope_file_list
-
-TestDrawingApp/cscope\.out
+.depend
+*.swp
+*~
+build/
